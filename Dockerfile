@@ -1,4 +1,4 @@
-FROM alpine:3.4
+FROM alpine:edge
 ENV GIT_BRANCH 9.0
 ENV DATABASE_HOST database
 ENV DATABASE_PORT 5432
@@ -15,16 +15,31 @@ RUN apk add --no-cache \
   openldap-dev \
   python-dev \
   py-setuptools \
+  py-inotify \
   git \
   py-pip \
   musl-dev \
   linux-headers \
-  gcc
+  gcc \
+  zlib-dev \
+  jpeg-dev \
+  wkhtmltopdf-dev \
+  freetype-dev \
+  py-imaging 
 
 COPY ./requirements.txt /tmp/
 RUN cd /tmp/ && pip install -r requirements.txt
 
+RUN pip install reportlab
 
 RUN git clone https://github.com/LevelupSolutions/odoo.git --depth 1 --single-branch --branch $GIT_BRANCH /app/
 
-CMD ["/app/odoo.py --db_host=$DATABASE_HOST --db_port=$DATABASE_PORT --db_user=$DATABASE_USER --db_password=$DATABASE_PASSWORD --database=$DATABASE_NAME"]
+RUN pip install reportlab
+
+RUN adduser -D odoo && chown -R odoo /app
+
+COPY ./launch.sh /app/
+
+RUN chmod +x /app/launch.sh
+USER odoo
+CMD /app/launch.sh

@@ -7,6 +7,7 @@ services:
       DATABASE_USER: "odoo"
       DATABASE_PASSWORD: "odoo"
       DATABASE_NAME: "odoo"
+      DATABASE_PORT: 5432
     links:
      - postgres
     depends_on:
